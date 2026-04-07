@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Minhas Finanças</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f5f2ec;
+  --card: #ffffff;
+  --ink: #1a1a18;
+  --muted: #8a8780;
+  --border: #e0dcd4;
+  --green: #1a7a4a;
+  --green-bg: #eaf5ef;
+  --red: #b83232;
+  --red-bg: #fdf0f0;
+  --yellow: #b86e00;
+  --yellow-bg: #fdf5e6;
+  --accent: #2a52a0;
+  --accent-bg: #eef1fa;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'DM Mono', monospace;
+  min-height: 100vh;
+}
+
+/* HEADER */
+.app-header {
+  background: var(--ink);
+  color: #f5f2ec;
+  padding: 20px 20px 24px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.app-title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 20px;
+  letter-spacing: -0.5px;
+}
+
+.month-nav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.month-btn {
+  background: rgba(255,255,255,0.12);
+  border: none;
+  color: #f5f2ec;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.2s;
+}
+.month-btn:hover { background: rgba(255,255,255,0.22); }
+
+.month-label {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  min-width: 120px;
+  text-align: center;
+}
+
+/* SUMMARY PILLS */
+.summary-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+}
+
+.pill {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+
+.pill-label {
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(245,242,236,0.5);
+  margin-bottom: 4px;
+}
+
+.pill-value {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: -0.5px;
+}
+
+.pill-value.positive { color: #5de0a0; }
+.pill-value.negative { color: #ff8080; }
+.pill-value.neutral { color: #f5f2ec; }
+
+/* TABS */
+.tabs {
+  display: flex;
+  gap: 0;
+  background: var(--border);
+  border-radius: 10px;
+  padding: 3px;
+  margin: 16px 16px 0;
+}
+
+.tab {
+  flex: 1;
+  background: none;
+  border: none;
+  padding: 8px 4px;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--muted);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tab.active {
+  background: var(--ink);
+  color: #f5f2ec;
+}
+
+/* MAIN */
+.main { padding: 16px; padding-bottom: 100px; }
+
+/* SECTION */
+.section { display: none; }
+.section.active { display: block; }
+
+/* ADD FORM */
+.add-form {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.form-title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+  color: var(--ink);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.form-grid.single { grid-template-columns: 1fr; }
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.field label {
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.field input, .field select {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 9px 11px;
+  font-family: 'DM Mono', monospace;
+  font-size: 13px;
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.2s;
+  width: 100%;
+}
+
+.field input:focus, .field select:focus {
+  border-color: var(--accent);
+}
+
+.type-btns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.type-btn {
+  padding: 9px;
+  border: 1.5px solid var(--border);
+  background: none;
+  border-radius: 8px;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: var(--muted);
+}
+
+.type-btn.entrada.active {
+  border-color: var(--green);
+  background: var(--green-bg);
+  color: var(--green);
+}
+
+.type-btn.saida.active {
+  border-color: var(--red);
+  background: var(--red-bg);
+  color: var(--red);
+}
+
+.btn-add {
+  width: 100%;
+  background: var(--ink);
+  color: #f5f2ec;
+  border: none;
+  border-radius: 8px;
+  padding: 11px;
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  transition: opacity 0.2s;
+}
+
+.btn-add:hover { opacity: 0.85; }
+
+/* LIST */
+.list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.list-title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.list-count {
+  font-size: 10px;
+  color: var(--muted);
+  background: var(--border);
+  padding: 2px 8px;
+  border-radius: 20px;
+}
+
+.item-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 13px 14px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  animation: popIn 0.2s ease;
+}
+
+@keyframes popIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+
+.item-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+  flex-shrink: 0;
+}
+
+.item-icon.entrada { background: var(--green-bg); }
+.item-icon.saida { background: var(--red-bg); }
+
+.item-info { flex: 1; min-width: 0; }
+
+.item-name {
+  font-family: 'Syne', sans-serif;
+  font-weight: 600;
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 2px;
+}
+
+.item-meta {
+  font-size: 10px;
+  color: var(--muted);
+}
+
+.item-right { text-align: right; flex-shrink: 0; }
+
+.item-value {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.item-value.entrada { color: var(--green); }
+.item-value.saida { color: var(--red); }
+
+.btn-del {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--border);
+  transition: color 0.2s;
+  padding: 2px;
+}
+.btn-del:hover { color: var(--red); }
+
+.empty-state {
+  text-align: center;
+  padding: 32px 16px;
+  color: var(--muted);
+}
+
+.empty-icon { font-size: 36px; margin-bottom: 8px; }
+.empty-text { font-size: 12px; line-height: 1.6; }
+
+/* DÍVIDAS */
+.debt-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 9px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 20px;
+}
+
+.debt-status.pendente { background: var(--yellow-bg); color: var(--yellow); }
+.debt-status.pago { background: var(--green-bg); color: var(--green); }
+
+.btn-toggle-debt {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  cursor: pointer;
+  color: var(--muted);
+  transition: all 0.2s;
+  margin-top: 4px;
+}
+.btn-toggle-debt:hover { border-color: var(--green); color: var(--green); }
+
+/* PROGRESS BAR */
+.progress-wrap {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.progress-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.progress-title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.progress-pct {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.progress-bar {
+  height: 8px;
+  background: var(--border);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 99px;
+  transition: width 0.5s ease;
+}
+
+.progress-fill.safe { background: var(--green); }
+.progress-fill.warn { background: var(--yellow); }
+.progress-fill.danger { background: var(--red); }
+
+/* DEBT SUMMARY */
+.debt-summary-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.dscard {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.dscard-label {
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+
+.dscard-value {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 18px;
+}
+
+.dscard-value.pago { color: var(--green); }
+.dscard-value.pendente { color: var(--red); }
+
+/* CLEAR BTN */
+.btn-clear-month {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  width: 100%;
+  margin-top: 8px;
+}
+.btn-clear-month:hover { border-color: var(--red); color: var(--red); }
+
+/* CATEGORIA BADGE */
+.cat-badge {
+  display: inline-block;
+  font-size: 9px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 1px 6px;
+  border-radius: 20px;
+  background: var(--accent-bg);
+  color: var(--accent);
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="app-header">
+  <div class="header-top">
+    <div class="app-title">💰 Minhas Finanças</div>
+    <div class="month-nav">
+      <button class="month-btn" onclick="changeMonth(-1)">‹</button>
+      <div class="month-label" id="monthLabel">—</div>
+      <button class="month-btn" onclick="changeMonth(1)">›</button>
+    </div>
+  </div>
+  <div class="summary-row">
+    <div class="pill">
+      <div class="pill-label">Entradas</div>
+      <div class="pill-value positive" id="summaryIn">R$ 0</div>
+    </div>
+    <div class="pill">
+      <div class="pill-label">Saídas</div>
+      <div class="pill-value negative" id="summaryOut">R$ 0</div>
+    </div>
+    <div class="pill">
+      <div class="pill-label">Saldo</div>
+      <div class="pill-value neutral" id="summaryBalance">R$ 0</div>
+    </div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('transacoes')">Transações</button>
+  <button class="tab" onclick="switchTab('dividas')">Dívidas</button>
+  <button class="tab" onclick="switchTab('resumo')">Resumo</button>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- TRANSAÇÕES -->
+  <div class="section active" id="sec-transacoes">
+    <div class="add-form">
+      <div class="form-title">Nova Transação</div>
+      <div class="type-btns">
+        <button class="type-btn entrada active" id="btnEntrada" onclick="setType('entrada')">✅ Entrada</button>
+        <button class="type-btn saida" id="btnSaida" onclick="setType('saida')">🔴 Saída</button>
+      </div>
+      <div class="form-grid">
+        <div class="field" style="grid-column:1/-1">
+          <label>Descrição</label>
+          <input type="text" id="txDesc" placeholder="Ex: Salário, Mercado...">
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="field">
+          <label>Valor (R$)</label>
+          <input type="number" id="txVal" placeholder="0,00" min="0" step="0.01">
+        </div>
+        <div class="field">
+          <label>Categoria</label>
+          <select id="txCat">
+            <option value="Geral">🏷 Geral</option>
+            <option value="Moradia">🏠 Moradia</option>
+            <option value="Alimentação">🍽 Alimentação</option>
+            <option value="Transporte">🚗 Transporte</option>
+            <option value="Saúde">💊 Saúde</option>
+            <option value="Lazer">🎮 Lazer</option>
+            <option value="Salário">💼 Salário</option>
+            <option value="Freelance">💻 Freelance</option>
+            <option value="Outros">📦 Outros</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn-add" onclick="addTransaction()">+ ADICIONAR</button>
+    </div>
+
+    <div class="list-header">
+      <div class="list-title">Lançamentos</div>
+      <div class="list-count" id="txCount">0 itens</div>
+    </div>
+    <div id="txList"></div>
+    <button class="btn-clear-month" onclick="clearMonth()">🗑 Limpar mês atual</button>
+  </div>
+
+  <!-- DÍVIDAS -->
+  <div class="section" id="sec-dividas">
+    <div class="add-form">
+      <div class="form-title">Nova Dívida / Cobrança</div>
+      <div class="form-grid">
+        <div class="field" style="grid-column:1/-1">
+          <label>Quem cobra / Descrição</label>
+          <input type="text" id="dbDesc" placeholder="Ex: Conta de luz, João...">
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="field">
+          <label>Valor (R$)</label>
+          <input type="number" id="dbVal" placeholder="0,00" min="0" step="0.01">
+        </div>
+        <div class="field">
+          <label>Vencimento</label>
+          <input type="date" id="dbDate">
+        </div>
+      </div>
+      <button class="btn-add" onclick="addDebt()">+ ADICIONAR DÍVIDA</button>
+    </div>
+
+    <div class="debt-summary-cards">
+      <div class="dscard">
+        <div class="dscard-label">Total Pendente</div>
+        <div class="dscard-value pendente" id="debtPending">R$ 0</div>
+      </div>
+      <div class="dscard">
+        <div class="dscard-label">Total Pago</div>
+        <div class="dscard-value pago" id="debtPaid">R$ 0</div>
+      </div>
+    </div>
+
+    <div class="list-header">
+      <div class="list-title">Dívidas</div>
+      <div class="list-count" id="dbCount">0 itens</div>
+    </div>
+    <div id="dbList"></div>
+  </div>
+
+  <!-- RESUMO -->
+  <div class="section" id="sec-resumo">
+    <div id="resumoContent"></div>
+  </div>
+
+</div>
+
+<script>
+// ── STATE ────────────────────────────────────────────────────────────────────
+let currentType = 'entrada';
+const MONTHS = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho',
+                 'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+
+let now = new Date();
+let currentYear = now.getFullYear();
+let currentMonth = now.getMonth(); // 0-based
+
+function monthKey() { return `${currentYear}-${String(currentMonth+1).padStart(2,'0')}`; }
+
+function getData() {
+  const raw = localStorage.getItem('financas_v2');
+  return raw ? JSON.parse(raw) : {};
+}
+
+function saveData(data) {
+  localStorage.setItem('financas_v2', JSON.stringify(data));
+}
+
+function getMonth() {
+  const all = getData();
+  const k = monthKey();
+  if (!all[k]) all[k] = { transactions: [], debts: [] };
+  return all[k];
+}
+
+function saveMonth(month) {
+  const all = getData();
+  all[monthKey()] = month;
+  saveData(all);
+}
+
+// ── FORMAT ───────────────────────────────────────────────────────────────────
+function fmt(v) {
+  return 'R$ ' + Number(v).toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+}
+
+// ── NAV ──────────────────────────────────────────────────────────────────────
+function changeMonth(d) {
+  currentMonth += d;
+  if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+  if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+  render();
+}
+
+// ── TYPE ─────────────────────────────────────────────────────────────────────
+function setType(t) {
+  currentType = t;
+  document.getElementById('btnEntrada').className = 'type-btn entrada' + (t === 'entrada' ? ' active' : '');
+  document.getElementById('btnSaida').className = 'type-btn saida' + (t === 'saida' ? ' active' : '');
+}
+
+// ── TABS ─────────────────────────────────────────────────────────────────────
+function switchTab(name) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('sec-' + name).classList.add('active');
+  event.target.classList.add('active');
+  if (name === 'resumo') renderResumo();
+}
+
+// ── ADD TX ───────────────────────────────────────────────────────────────────
+function addTransaction() {
+  const desc = document.getElementById('txDesc').value.trim();
+  const val  = parseFloat(document.getElementById('txVal').value);
+  const cat  = document.getElementById('txCat').value;
+  if (!desc || !val || val <= 0) { alert('Preencha descrição e valor!'); return; }
+
+  const month = getMonth();
+  month.transactions.push({
+    id: Date.now(),
+    desc, val, cat,
+    type: currentType,
+    date: new Date().toLocaleDateString('pt-BR')
+  });
+  saveMonth(month);
+
+  document.getElementById('txDesc').value = '';
+  document.getElementById('txVal').value = '';
+  renderTransactions();
+  updateSummary();
+}
+
+// ── ADD DEBT ─────────────────────────────────────────────────────────────────
+function addDebt() {
+  const desc = document.getElementById('dbDesc').value.trim();
+  const val  = parseFloat(document.getElementById('dbVal').value);
+  const date = document.getElementById('dbDate').value;
+  if (!desc || !val || val <= 0) { alert('Preencha descrição e valor!'); return; }
+
+  const month = getMonth();
+  month.debts.push({
+    id: Date.now(),
+    desc, val,
+    dueDate: date,
+    paid: false
+  });
+  saveMonth(month);
+
+  document.getElementById('dbDesc').value = '';
+  document.getElementById('dbVal').value = '';
+  document.getElementById('dbDate').value = '';
+  renderDebts();
+}
+
+// ── DELETE ───────────────────────────────────────────────────────────────────
+function deleteTx(id) {
+  if (!confirm('Remover este lançamento?')) return;
+  const month = getMonth();
+  month.transactions = month.transactions.filter(t => t.id !== id);
+  saveMonth(month);
+  renderTransactions();
+  updateSummary();
+}
+
+function deleteDebt(id) {
+  if (!confirm('Remover esta dívida?')) return;
+  const month = getMonth();
+  month.debts = month.debts.filter(d => d.id !== id);
+  saveMonth(month);
+  renderDebts();
+}
+
+function toggleDebt(id) {
+  const month = getMonth();
+  const debt = month.debts.find(d => d.id === id);
+  if (debt) debt.paid = !debt.paid;
+  saveMonth(month);
+  renderDebts();
+}
+
+// ── CLEAR MONTH ──────────────────────────────────────────────────────────────
+function clearMonth() {
+  if (!confirm(`Limpar todos os lançamentos de ${MONTHS[currentMonth]} ${currentYear}?`)) return;
+  const all = getData();
+  all[monthKey()] = { transactions: [], debts: [] };
+  saveData(all);
+  renderTransactions();
+  updateSummary();
+}
+
+// ── RENDER TX ─────────────────────────────────────────────────────────────────
+function renderTransactions() {
+  const month = getMonth();
+  const txs = month.transactions;
+  const list = document.getElementById('txList');
+  document.getElementById('txCount').textContent = txs.length + ' itens';
+
+  if (!txs.length) {
+    list.innerHTML = `<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-text">Nenhum lançamento ainda.<br>Adicione entradas e saídas acima.</div></div>`;
+    return;
+  }
+
+  // newest first
+  const sorted = [...txs].reverse();
+  list.innerHTML = sorted.map(t => `
+    <div class="item-card">
+      <div class="item-icon ${t.type}">${t.type === 'entrada' ? '↑' : '↓'}</div>
+      <div class="item-info">
+        <div class="item-name">${t.desc}</div>
+        <div class="item-meta">${t.date} · <span class="cat-badge">${t.cat}</span></div>
+      </div>
+      <div class="item-right">
+        <div class="item-value ${t.type}">${t.type === 'entrada' ? '+' : '-'}${fmt(t.val)}</div>
+        <button class="btn-del" onclick="deleteTx(${t.id})">✕</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ── RENDER DEBTS ──────────────────────────────────────────────────────────────
+function renderDebts() {
+  const month = getMonth();
+  const debts = month.debts;
+  const list = document.getElementById('dbList');
+  document.getElementById('dbCount').textContent = debts.length + ' itens';
+
+  // summary
+  const pending = debts.filter(d => !d.paid).reduce((s, d) => s + d.val, 0);
+  const paid    = debts.filter(d =>  d.paid).reduce((s, d) => s + d.val, 0);
+  document.getElementById('debtPending').textContent = fmt(pending);
+  document.getElementById('debtPaid').textContent    = fmt(paid);
+
+  if (!debts.length) {
+    list.innerHTML = `<div class="empty-state"><div class="empty-icon">🎉</div><div class="empty-text">Nenhuma dívida cadastrada.<br>Ótimo!</div></div>`;
+    return;
+  }
+
+  list.innerHTML = debts.map(d => {
+    const due = d.dueDate ? new Date(d.dueDate + 'T00:00:00').toLocaleDateString('pt-BR') : '—';
+    return `
+    <div class="item-card" style="${d.paid ? 'opacity:0.6' : ''}">
+      <div class="item-icon saida">${d.paid ? '✓' : '⚠'}</div>
+      <div class="item-info">
+        <div class="item-name" style="${d.paid ? 'text-decoration:line-through' : ''}">${d.desc}</div>
+        <div class="item-meta">Vence: ${due}</div>
+        <button class="btn-toggle-debt" onclick="toggleDebt(${d.id})">${d.paid ? '↩ Desfazer' : '✓ Marcar como pago'}</button>
+      </div>
+      <div class="item-right">
+        <div class="item-value saida">${fmt(d.val)}</div>
+        <div class="debt-status ${d.paid ? 'pago' : 'pendente'}">${d.paid ? '● pago' : '● pendente'}</div>
+        <button class="btn-del" onclick="deleteDebt(${d.id})">✕</button>
+      </div>
+    </div>
+  `}).join('');
+}
+
+// ── SUMMARY ───────────────────────────────────────────────────────────────────
+function updateSummary() {
+  const month = getMonth();
+  const txs = month.transactions;
+  const inTotal  = txs.filter(t => t.type === 'entrada').reduce((s, t) => s + t.val, 0);
+  const outTotal = txs.filter(t => t.type === 'saida').reduce((s, t) => s + t.val, 0);
+  const balance  = inTotal - outTotal;
+
+  document.getElementById('summaryIn').textContent = fmt(inTotal);
+  document.getElementById('summaryOut').textContent = fmt(outTotal);
+  const balEl = document.getElementById('summaryBalance');
+  balEl.textContent = fmt(balance);
+  balEl.className = 'pill-value ' + (balance >= 0 ? 'positive' : 'negative');
+}
+
+// ── RESUMO ────────────────────────────────────────────────────────────────────
+function renderResumo() {
+  const month = getMonth();
+  const txs = month.transactions;
+  const debts = month.debts;
+
+  const inTotal  = txs.filter(t => t.type === 'entrada').reduce((s, t) => s + t.val, 0);
+  const outTotal = txs.filter(t => t.type === 'saida').reduce((s, t) => s + t.val, 0);
+  const balance  = inTotal - outTotal;
+  const gastoPct = inTotal > 0 ? Math.min((outTotal / inTotal) * 100, 100) : 0;
+  const fillClass = gastoPct < 60 ? 'safe' : gastoPct < 85 ? 'warn' : 'danger';
+
+  // por categoria
+  const cats = {};
+  txs.filter(t => t.type === 'saida').forEach(t => {
+    cats[t.cat] = (cats[t.cat] || 0) + t.val;
+  });
+  const catList = Object.entries(cats).sort((a, b) => b[1] - a[1]);
+
+  const pendingDebt = debts.filter(d => !d.paid).reduce((s, d) => s + d.val, 0);
+
+  document.getElementById('resumoContent').innerHTML = `
+    <div class="progress-wrap">
+      <div class="progress-label">
+        <span class="progress-title">Gastos vs Entradas</span>
+        <span class="progress-pct">${gastoPct.toFixed(0)}% gasto</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill ${fillClass}" style="width:${gastoPct}%"></div>
+      </div>
+    </div>
+
+    <div class="debt-summary-cards">
+      <div class="dscard">
+        <div class="dscard-label">Entradas</div>
+        <div class="dscard-value pago">${fmt(inTotal)}</div>
+      </div>
+      <div class="dscard">
+        <div class="dscard-label">Saídas</div>
+        <div class="dscard-value pendente">${fmt(outTotal)}</div>
+      </div>
+      <div class="dscard">
+        <div class="dscard-label">Saldo</div>
+        <div class="dscard-value" style="color:${balance >= 0 ? 'var(--green)' : 'var(--red)'}">${fmt(balance)}</div>
+      </div>
+      <div class="dscard">
+        <div class="dscard-label">Dívidas Pendentes</div>
+        <div class="dscard-value pendente">${fmt(pendingDebt)}</div>
+      </div>
+    </div>
+
+    ${catList.length ? `
+    <div class="add-form">
+      <div class="form-title">Gastos por Categoria</div>
+      ${catList.map(([cat, val]) => {
+        const pct = inTotal > 0 ? Math.min((val / inTotal) * 100, 100) : 0;
+        return `
+          <div style="margin-bottom:12px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+              <span style="font-size:12px">${cat}</span>
+              <span style="font-size:11px;color:var(--muted)">${fmt(val)} · ${pct.toFixed(0)}%</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill warn" style="width:${pct}%"></div>
+            </div>
+          </div>
+        `;
+      }).join('')}
+    </div>
+    ` : ''}
+
+    ${txs.length === 0 && debts.length === 0 ? `
+    <div class="empty-state">
+      <div class="empty-icon">📊</div>
+      <div class="empty-text">Adicione transações e dívidas<br>para ver seu resumo financeiro.</div>
+    </div>
+    ` : ''}
+  `;
+}
+
+// ── RENDER MONTH LABEL ────────────────────────────────────────────────────────
+function renderMonthLabel() {
+  document.getElementById('monthLabel').textContent = `${MONTHS[currentMonth]} ${currentYear}`;
+}
+
+// ── MAIN RENDER ───────────────────────────────────────────────────────────────
+function render() {
+  renderMonthLabel();
+  renderTransactions();
+  renderDebts();
+  updateSummary();
+}
+
+// INIT
+render();
+</script>
+</body>
+</html>
